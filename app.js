@@ -1,29 +1,18 @@
 const { createBot, createProvider, createFlow, addKeyword } = require('@bot-whatsapp/bot')
 
-const QRPortalWeb = require('@bot-whatsapp/portal')
+const QRPortalWeb = require('./portal')
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
 const MySQLAdapter = require('@bot-whatsapp/database/mysql')
 
 /**
  * Declaramos las conexiones de MySQL
  */
-const MYSQL_DB_HOST = 'mysql-jaime.alwaysdata.net'
-const MYSQL_DB_USER = 'jaime'
-const MYSQL_DB_PASSWORD = 'jaime2004?'
-const MYSQL_DB_NAME = 'jaime_node'
+const MYSQL_DB_HOST = process.env.DB_HOST
+const MYSQL_DB_USER = process.env.DB_USER
+const MYSQL_DB_PASSWORD = process.env.DB_PASSWORD
+const MYSQL_DB_NAME = process.env.DB_NAME
 const MYSQL_DB_PORT = '3306'
 
-/**
- * Aqui declaramos los flujos hijos, los flujos se declaran de atras para adelante, es decir que si tienes un flujo de este tipo:
- *
- *          Menu Principal
- *           - SubMenu 1
- *             - Submenu 1.1
- *           - Submenu 2
- *             - Submenu 2.1
- *
- * Primero declaras los submenus 1.1 y 2.1, luego el 1 y 2 y al final el principal.
- */
 
 const flowSecundario = addKeyword(['gracias', 'grac']).addAnswer(
     [
@@ -43,7 +32,7 @@ const flowMasajes = addKeyword(['masajes', 'masages','masaje','masage']).addAnsw
     [flowSecundario]
 )
 
-const flowReservar = addKeyword(['reservar', 'reserva']).addAnswer(
+const flowReservar = addKeyword(['reservar', 'reserva', 'agendar']).addAnswer(
     [
         'Para hacer una reserva, puedes comunicarte directamente con nosotros al número de teléfono 3027643007 o en un momento un acesor te atendera.', 
         '¡Estaremos encantados de atenderte y reservar tu cita! 📅',
@@ -64,7 +53,7 @@ const flowHorarios = addKeyword(['horarios', 'horarios de atencion', 'orarios'])
 )
 
 
-const flowPaginaWeb = addKeyword(['pagina Web', 'web', 'pagina']).addAnswer(
+const flowPaginaWeb = addKeyword(['pagina', 'web', 'pagina  Web']).addAnswer(
     ['¡Claro! Puedes visitar nuestro sitio web en homemasaje.com para obtener más información, consultar nuestros servicios y precios, y realizar reservas de manera rápida y sencilla. ¡Te esperamos en línea! 🌐'],
     null,
     null,
@@ -72,13 +61,13 @@ const flowPaginaWeb = addKeyword(['pagina Web', 'web', 'pagina']).addAnswer(
 )
 
 const flowContacto = addKeyword(['contacto', 'contactos']).addAnswer(
-    ['Puedes contactarnos al número de teléfono +3027643007 o visitar nuestro sitio web homemasaje.com para más información. 📞'],
+    ['Puedes contactarnos al número de teléfono 3027643007 o visitar nuestro sitio web homemasaje.com para más información. 📞'],
     null,
     null,
     [flowSecundario]
 )
 
-const flowPrincipal = addKeyword(['hola', 'ole', 'alo'])
+const flowPrincipal = addKeyword(['hola', 'ole', 'buenas'])
     .addAnswer('¡Hola! Soy un robot 🤖. Aquí tienes la información que puedo ofrecerte: ✨')
     .addAnswer(
         [
@@ -101,7 +90,7 @@ const main = async () => {
         password: MYSQL_DB_PASSWORD,
         port: MYSQL_DB_PORT,
     })
-    const adapterFlow = createFlow([flowPrincipal])
+    const adapterFlow = createFlow([flowPrincipal,flowSecundario])
     const adapterProvider = createProvider(BaileysProvider)
     createBot({
         flow: adapterFlow,
